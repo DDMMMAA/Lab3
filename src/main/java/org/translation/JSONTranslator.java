@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * An implementation of the Translator interface which reads in the translation
@@ -16,6 +17,8 @@ import org.json.JSONArray;
 public class JSONTranslator implements Translator {
 
     // TODO Task: pick appropriate instance variables for this class
+    private final ArrayList<JSONObject> countryInfo;
+    private final String countryCodeKey = "alpha3";
 
     /**
      * Constructs a JSONTranslator using data from the sample.json resources file.
@@ -39,6 +42,11 @@ public class JSONTranslator implements Translator {
 
             // TODO Task: use the data in the jsonArray to populate your instance variables
             //            Note: this will likely be one of the most substantial pieces of code you write in this lab.
+            countryInfo = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject country = jsonArray.getJSONObject(i);
+                countryInfo.add(country);
+            }
 
         }
         catch (IOException | URISyntaxException ex) {
@@ -50,19 +58,34 @@ public class JSONTranslator implements Translator {
     public List<String> getCountryLanguages(String country) {
         // TODO Task: return an appropriate list of language codes,
         //            but make sure there is no aliasing to a mutable object
-        return new ArrayList<>();
+        ArrayList<String> languages = new ArrayList<>();
+        for (JSONObject jsonObject : countryInfo) {
+            if (jsonObject.getString(countryCodeKey).equals(country)) {
+                languages.addAll(jsonObject.keySet());
+            }
+        }
+        return languages.subList(3, languages.size());
     }
 
     @Override
     public List<String> getCountries() {
         // TODO Task: return an appropriate list of country codes,
         //            but make sure there is no aliasing to a mutable object
-        return new ArrayList<>();
+        ArrayList<String> countries = new ArrayList<>();
+        for (JSONObject jsonObject : countryInfo) {
+            countries.add(jsonObject.getString(countryCodeKey));
+        }
+        return countries;
     }
 
     @Override
     public String translate(String country, String language) {
         // TODO Task: complete this method using your instance variables as needed
+        for (JSONObject jsonObject : countryInfo) {
+            if (jsonObject.getString(countryCodeKey).equals(country)) {
+                return jsonObject.getString(language);
+            }
+        }
         return null;
     }
 }
